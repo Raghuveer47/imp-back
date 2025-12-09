@@ -18,9 +18,41 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+def health_check(request):
+    """Health check endpoint for mobile apps and monitoring"""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Employee Attendance API is running',
+        'version': '1.0.0',
+        'cloudinary_configured': bool(settings.CLOUDINARY_CLOUD_NAME if hasattr(settings, 'CLOUDINARY_CLOUD_NAME') else False)
+    })
+
+def api_info(request):
+    """API information endpoint"""
+    return JsonResponse({
+        'api_name': 'Employee Attendance System',
+        'endpoints': {
+            'health': '/api/health/',
+            'employees': '/api/employees/',
+            'attendance': '/api/attendance/',
+            'locations': '/api/employee-locations/',
+            'alerts': '/api/location-alerts/',
+        },
+        'documentation': 'Check the API endpoints for usage'
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('employees.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/health/', health_check, name='health_check'),
+    path('api/info/', api_info, name='api_info'),
+]
+
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

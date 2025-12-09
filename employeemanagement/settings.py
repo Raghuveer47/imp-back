@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,14 +25,42 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dvemcyi2l-i)f^fz2&6n$&+onq)aw5xe6wzn(--tx@#&x^2_7a'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dvemcyi2l-i)f^fz2&6n$&+onq)aw5xe6wzn(--tx@#&x^2_7a')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+# Allow connections from anywhere for development and mobile apps
+ALLOWED_HOSTS = ['*']  # Allow all hosts for flexibility
 
+# CORS settings - allow all origins for mobile app access
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173", 
+    "http://localhost:5174",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://192.168.29.250:3000",
+    "http://192.168.29.250:5173",
+    "http://192.168.29.253:3000",
+    "http://192.168.29.253:5173",
+    "http://172.20.10.8:3000",     # ✅ Added your new IP
+    "http://172.20.10.8:5173",     # ✅ Added your new IP
+    "http://172.20.10.8:5174",     # ✅ Added your new IP
+    "http://192.168.29.15:3000",
+    "http://192.168.29.15:5173",
+    "capacitor://localhost",
+    "ionic://localhost",
+    "http://localhost",
+    "https://localhost",
+]
 
+# Add any additional origins from environment
+if os.environ.get('CORS_ADDITIONAL_ORIGINS'):
+    CORS_ALLOWED_ORIGINS.extend(os.environ.get('CORS_ADDITIONAL_ORIGINS').split(','))
 
 
 # Application definition
@@ -57,8 +90,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'employeemanagement.urls'
 
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
